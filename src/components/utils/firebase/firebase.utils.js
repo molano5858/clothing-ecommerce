@@ -17,21 +17,20 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 
 // parte de AUTENTICACION
-const provider= new GoogleAuthProvider();
-provider.setCustomParameters({
+const googleProvider= new GoogleAuthProvider();
+googleProvider.setCustomParameters({
     prompt:'select_account'
 });
 
 export const auth= getAuth();
- export const signInWithGooglePopUp= ()=> signInWithPopup(auth, provider) // esta opcion da nos errores de CORS en consola, igual funciona
+ export const signInWithGooglePopUp= ()=> signInWithPopup(auth, googleProvider) // esta opcion da nos errores de CORS en consola, igual funciona
 // pero mejor la hago con la opcion signInWithRedirect
-// export const signInWithGooglePopUp= ()=> signInWithRedirect(auth, provider)
+export const signInWithGoogleRedirect= ()=> signInWithRedirect(auth, googleProvider)
 // ahora hay que ir a firebase y buscar autenticacion, entrar y seleccionar google y darle en permitir 
 
 // parte de FIRESTORE BASE DE DATOS
 // lo que hace todo esto es tomar la info del usuario que se registro y agregarlo a la base de datos
 export const db=getFirestore();
-console.log('hola',db)
 
 export const createUserDocumentFromAuth= async (userAuth)=>{
     const userDocRef=doc(db,'users',userAuth.uid)
