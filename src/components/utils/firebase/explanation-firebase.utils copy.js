@@ -1,14 +1,10 @@
+// ESTE ARCHIVO ES UNA COPIA DE LO QUE TENIAMOS HASTA CIERTA CLASE, PERO EL PROFESOR LO BORRO PARA SEGUIR, ES IMPORTANTE
+// LO QUE HAY AQUI YA QUE EXPLICA COMO USAR AUTENTICACION CON FIREBASE Y CREAR REGISTROS EN LA BASE DE DATOS FIRESTORE
+
 // aqui vamos a crear todo para incorporar firebase al proyecto
 
 import {initializeApp} from 'firebase/app' // INICIALIZAR
-import {
-        getAuth, 
-        signInWithPopup ,
-        signInWithRedirect, // para redirect de google
-        GoogleAuthProvider,// cuando el proveedor que elegimos en firebase es google
-        createUserWithEmailAndPassword,// cuando elegimos el proveedor nativo de email y contraseña
-        signInWithEmailAndPassword // cuando elegimos entrar con email y password
-    } from 'firebase/auth'// AUTENTICACION
+import {getAuth, signInWithPopup ,signInWithRedirect, GoogleAuthProvider} from 'firebase/auth'// AUTENTICACION
 import {getFirestore,doc, getDoc,setDoc} from 'firebase/firestore' // FIRESTORE BASE DE DATOS
 
 // esta es la parte de INICIALIZAR 
@@ -30,32 +26,32 @@ googleProvider.setCustomParameters({
 });
 
 export const auth= getAuth();
- export const signInWithGooglePopUp= ()=> signInWithPopup(auth, googleProvider) // esta opcion da nos errores de CORS en consola, igual funciona
-// pero mejor la hago con la opcion signInWithRedirect
-export const signInWithGoogleRedirect= ()=> signInWithRedirect(auth, googleProvider)
+ export const signInWithGooglePopUp= ()=> signInWithPopup(auth, googleProvider) // saca un popup para autenticarnos
+export const signInWithGoogleRedirect= ()=> signInWithRedirect(auth, googleProvider)// nos redirije a otra ventana apra autenticarnos
+
+
 // ahora hay que ir a firebase y buscar autenticacion, entrar y seleccionar google y darle en permitir 
 
 // parte de FIRESTORE BASE DE DATOS
 // lo que hace todo esto es tomar la info del usuario que se registro y agregarlo a la base de datos
 export const db=getFirestore();
 
-export const createUserDocumentFromAuth= async (userAuth, additionalInformation={})=>{
-    if(!userAuth){return} // si no recibimos nada no se hace nada
+export const createUserDocumentFromAuth= async (userAuth)=>{
     const userDocRef=doc(db,'users',userAuth.uid)
+    console.log(userDocRef)
     const userSnapShot= await getDoc(userDocRef) // sirve para ver si el usuario existe o no en la base de datos
     //console.log(userSnapShot.exists()) //el usuario no existe aun por eso deberia dar false
 
     // si el usuario no existe vamos a crearlo
     if(!userSnapShot.exists()){
-        const {name,email} =userAuth;//AQUI AQUI AQUI IBA displayName
+        const {displayName, email} =userAuth;
         const createdAt = new Date();
 
         try {
             await setDoc(userDocRef,{
-                name,//AQUI AQUI AQUI IBA displayName
+                displayName,
                 email,
-                createdAt,
-                ...additionalInformation
+                createdAt
             })
         } catch (error) {
             console.log('Error creatint user ', error.message)
@@ -65,15 +61,3 @@ export const createUserDocumentFromAuth= async (userAuth, additionalInformation=
         return userDocRef
     }
 } 
-
-// creando autenticacion par aun usuario con email y contraseña
-
-export const createAuthUserWithEmailAndPassword= async (email,password)=>{
-    if(!email || !password){return} // si no recibimos nada no se hace nada
-    return await createUserWithEmailAndPassword(auth,email,password)
-}
-
-export const signInAuthUserWithEmailAndPassword = async (email,password)=>{
-    if(!email || !password){return} // si no recibimos nada no se hace nada
-    return await signInWithEmailAndPassword(auth,email,password)
-}
