@@ -7,7 +7,9 @@ import {
         signInWithRedirect, // para redirect de google
         GoogleAuthProvider,// cuando el proveedor que elegimos en firebase es google
         createUserWithEmailAndPassword,// cuando elegimos el proveedor nativo de email y contraseña
-        signInWithEmailAndPassword // cuando elegimos entrar con email y password
+        signInWithEmailAndPassword, // cuando elegimos entrar con email y password
+        signOut, //metodo de firebase para salir
+        onAuthStateChanged// este es como un observador que nos permite cambiar cosas cuando la autenticacion cambia
     } from 'firebase/auth'// AUTENTICACION
 import {getFirestore,doc, getDoc,setDoc} from 'firebase/firestore' // FIRESTORE BASE DE DATOS
 
@@ -47,12 +49,12 @@ export const createUserDocumentFromAuth= async (userAuth, additionalInformation=
 
     // si el usuario no existe vamos a crearlo
     if(!userSnapShot.exists()){
-        const {name,email} =userAuth;//AQUI AQUI AQUI IBA displayName
+        const {displayName,email} =userAuth;
         const createdAt = new Date();
 
         try {
             await setDoc(userDocRef,{
-                name,//AQUI AQUI AQUI IBA displayName
+                displayName,
                 email,
                 createdAt,
                 ...additionalInformation
@@ -77,3 +79,10 @@ export const signInAuthUserWithEmailAndPassword = async (email,password)=>{
     if(!email || !password){return} // si no recibimos nada no se hace nada
     return await signInWithEmailAndPassword(auth,email,password)
 }
+
+export const signOutUser= async ()=>await signOut(auth); 
+// este lo vamos a importar en navigation para cerrar sesion
+
+// este es como un observador o un escuchador de cuando la autenticacion cambia
+export const onAuthStateChangedListener = (callback)=>onAuthStateChanged(auth,callback)// recibe dos parametros, 1 al autenticador, 2 un callback 
+//de lo que queires hacer

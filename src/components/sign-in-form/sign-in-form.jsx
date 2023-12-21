@@ -1,5 +1,4 @@
-import { useState, useContext } from "react"
-import { UserContext } from "../contexts/user"
+import { useState} from "react"
 import {
         signInAuthUserWithEmailAndPassword,
         createUserDocumentFromAuth,
@@ -16,12 +15,8 @@ const SignInForm=()=>{
 
     // vamos a crear el usuario que va a pedir a firebase atutenticacion, tiene que ser asincrono
     const singInWithGoogle= async ()=>{
-        const response = await signInWithGooglePopUp();
-        await createUserDocumentFromAuth(response.user)
+        await signInWithGooglePopUp();
     }
-
-    // usando useContext
-    const {setCurrentUser}=useContext(UserContext)
 
     const [formFields, setFormFields]=useState(defaultFormFields);
     const {email,password}=formFields;
@@ -33,12 +28,8 @@ const SignInForm=()=>{
     const handleSubmit= async (event)=>{ // esta se ejecuta cuando el submit del formulario se envia, en este caso el Sign In
         event.preventDefault();// prevenir el default del boton submit que ya sabes que genera cuando se ejecuta
         try {
-
             // aqui deconstruyo response, seria lo mismo que response.user
             const {user} = await signInAuthUserWithEmailAndPassword(email,password) // 
-            console.log('respuesta',user)
-            // cuando tenemos la respuesta del usuario entonces la almacenamos en el contexto
-            setCurrentUser(user)
             resetFormFields()
         } catch (error) {
             if(error.code ==='auth/invalid-credential'){
