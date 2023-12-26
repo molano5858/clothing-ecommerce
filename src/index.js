@@ -5,12 +5,18 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter} from 'react-router-dom';
 import {UserProvider} from './components/contexts/user'
+import {ProductsProvider} from './components/contexts/products'
+import {CartDropdownProvider} from './components/contexts/cart-dropdown'
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <UserProvider>
-        <App />
+        <ProductsProvider>
+          <CartDropdownProvider>
+            <App />
+          </CartDropdownProvider>  
+        </ProductsProvider>
       </UserProvider>
     </BrowserRouter>
   </React.StrictMode>,
