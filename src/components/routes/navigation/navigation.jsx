@@ -6,8 +6,8 @@ import {ReactComponent as CrwnLogo} from '../../../assets/crown.svg'
 import { UserContext } from '../../contexts/user'
 import {signOutUser} from '../../utils/firebase/firebase.utils'
 import CartIcon from '../../cart-icon/cart-icon'
-import CartDropdown from '../../cart-dropdown/cart.dropdown'
-import {CartDropdownContext} from '../../contexts/cart-dropdown'
+import CartDropdown from '../../cart-dropdown/cart-dropdown'
+import {CartDropdownContext} from '../../contexts/cart-dropdown.context'
 const Navigation = ()=>{
   //voy a accesar al usuario que esta guardado en el contexto
   const {currentUser}=useContext(UserContext)
@@ -23,7 +23,7 @@ const Navigation = ()=>{
   // } ESTO YA NO SE USA PORQUE EL LISTENER DE SI ESTA ADENTRO O AFUERA EL USUARIO LO VA A ESCUCHAR, ENTONCES YA NO TENEMOS QUE ACTALIZARLO
   // EN EL CONTEXTO
 
-
+  
     
 
     return (
