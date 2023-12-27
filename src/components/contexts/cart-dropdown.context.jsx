@@ -1,4 +1,4 @@
-import { createContext, useState} from "react"; 
+import { createContext, useState,useEffect} from "react"; 
 
 const addCartItem=(cartItems,productToAdd)=>{
     // necesito ver si cartItems contiene el productToAdd
@@ -13,11 +13,27 @@ const addCartItem=(cartItems,productToAdd)=>{
             
         )
     }
-
     return [...cartItems,{...productToAdd,quantity:1}]// estamos devolviendo los items del carro ya existentes y le estamos agregando el nuevo
     // y como es nuevo tenemos que agregarle la propiedad quantity porque no la traia.
 }
 
+const removeCartItem=(cartItems,cartItemToRemove)=>{
+    // verificando si el producto existe en el arreglo de los items existentes
+    const existingCartItem = cartItems.find((cartItem)=>cartItem.id===cartItemToRemove.id)
+
+    // si existe entonces vamos a ver si su cantidad es 1 para removerlo de la lista
+    if(existingCartItem.quantity===1){
+        return cartItems.filter((cartItem)=>cartItem.id !== cartItemToRemove.id)
+    }
+    return cartItems.map(
+        (cartItem)=>cartItem.id===cartItemToRemove.id ? {...cartItem,quantity:cartItem.quantity-1}:cartItem
+        
+    )
+}
+
+const clearCartItem=(cartItems,cartItemToClear)=>{
+    return cartItems.filter((cartItem)=>cartItem.id!==cartItemToClear.id)
+}
 
 export const CartDropdownContext =createContext(
     {
@@ -25,17 +41,36 @@ export const CartDropdownContext =createContext(
         setIsCartOpen:()=>{},
         cartItems:[],// el estado de que items hemos adicionado en el carrito
         addItemToCart:()=>{}, // funcion propia para adicionar items al carrito
+        removeItemToCart:()=>{}, // para ir quitando items del carrito
+        cartCount:0, //para llevar la cuenta de cuantos items hay en el carro /(mas que todo para el icono del shop) 
+        clearItemFromCart: () => {},
     }
 )
 
 export const CartDropdownProvider =({children})=>{
     const [isCartOpen,setIsCartOpen]=useState(false);
     const [cartItems,setCartItems]=useState([]);
+    const [cartCount,setCartCount]=useState(0);
+
+    useEffect(
+        ()=>{
+           const newCartCount=cartItems.reduce((accumulator,cartItem)=>{return accumulator+cartItem.quantity},0)
+           setCartCount(newCartCount)
+        }
+    ,[cartItems])//queremos actualizar la cuenta de items cada vez que cambie este estado de cartItems, osea cada que agreguen uno
 
     const addItemToCart=(productToAdd)=>{
         setCartItems(addCartItem(cartItems,productToAdd))
     }
 
-    const value={isCartOpen,setIsCartOpen,addItemToCart,cartItems}
+    const removeItemToCart=(cartItemToRemove)=>{
+        setCartItems(removeCartItem(cartItems,cartItemToRemove))
+    }
+
+    const clearItemFromCart = (cartItemToClear) => {
+        setCartItems(clearCartItem(cartItems, cartItemToClear));
+      };
+
+    const value={isCartOpen,setIsCartOpen,addItemToCart,removeItemToCart,cartItems,cartCount,clearItemFromCart}
     return (<CartDropdownContext.Provider value={value} >{children}</CartDropdownContext.Provider>)
 }
