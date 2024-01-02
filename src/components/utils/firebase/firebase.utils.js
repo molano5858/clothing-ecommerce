@@ -9,9 +9,14 @@ import {
         createUserWithEmailAndPassword,// cuando elegimos el proveedor nativo de email y contraseña
         signInWithEmailAndPassword, // cuando elegimos entrar con email y password
         signOut, //metodo de firebase para salir
-        onAuthStateChanged// este es como un observador que nos permite cambiar cosas cuando la autenticacion cambia
+        onAuthStateChanged,// este es como un observador que nos permite cambiar cosas cuando la autenticacion cambia
     } from 'firebase/auth'// AUTENTICACION
-import {getFirestore,doc, getDoc,setDoc} from 'firebase/firestore' // FIRESTORE BASE DE DATOS
+import {getFirestore,doc, getDoc,setDoc,
+        collection,// sirve para crear una nueva coleccion en firebase
+        writeBatch,// 
+        query,
+        getDocs,
+    } from 'firebase/firestore' // FIRESTORE BASE DE DATOS
 
 // esta es la parte de INICIALIZAR 
 // lo siguiente se copia y pega desde la pagina de firebase, se debe entrar al proyecto alla y registrarlo y genera este codigo
@@ -40,6 +45,36 @@ export const signInWithGoogleRedirect= ()=> signInWithRedirect(auth, googleProvi
 // parte de FIRESTORE BASE DE DATOS
 // lo que hace todo esto es tomar la info del usuario que se registro y agregarlo a la base de datos
 export const db=getFirestore();
+
+// vamos a crear un metodo para poder crear colecciones en firebase, es para subir un json con los productos
+export const addCollectionsAndDocuments =async(collectionKey,objectsToAdd)=>{// (nombre que le quiero dar, elementos que quiero crear)
+    const collectionRef= collection(db,collectionKey)//Collection es el metodo que importamos, db es la db de firebase, collectionKey es como el nombre que le vamos a dar
+    const batch=writeBatch(db);
+    
+    objectsToAdd.forEach((object)=>{
+        const docRef=doc(collectionRef,object.title.toLowerCase())
+        batch.set(docRef,object)
+    })
+
+    await batch.commit();
+    console.log('done')
+} // esto va a ir en el contexto de productos
+
+// vamos a crear un metodo para traer esa coleccion que creamos aqui arriba con addCollectionsAndDocuments
+export const getCategoriesAndDocuments = async ()=>{
+    const collectionRef=collection(db,'categories');// 'categories' es el nombre que tiene la colecction en firebase
+    const q= query(collectionRef)
+
+    const querySnapshot= await getDocs(q);
+    const categoryMaps=querySnapshot.docs.reduce((
+        accumulator, docSnapShot)=>{
+            const {title, items}=docSnapShot.data();
+            accumulator[title.toLowerCase()]=items;
+            return accumulator
+        }
+        ,{})// aquivalor inicial de reduce es un {} vacio
+    return categoryMaps
+}
 
 export const createUserDocumentFromAuth= async (userAuth, additionalInformation={})=>{
     if(!userAuth){return} // si no recibimos nada no se hace nada

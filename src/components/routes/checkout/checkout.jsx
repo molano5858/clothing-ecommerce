@@ -4,7 +4,7 @@ import { CartDropdownContext } from '../../contexts/cart-dropdown.context'
 import CheckoutItem from '../../checkout-item/checkout-item'
 
 const Checkout=()=>{
-    const {cartItems}=useContext(CartDropdownContext)
+    const {cartItems,cartTotal}=useContext(CartDropdownContext)
 
     
     return (
@@ -40,7 +40,7 @@ const Checkout=()=>{
 
             
                 
-            <span className='total'>Total 0</span>
+            <span className='total'>Total: ${cartTotal}</span>
 
         </div>
     )

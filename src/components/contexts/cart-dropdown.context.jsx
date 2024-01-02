@@ -44,6 +44,7 @@ export const CartDropdownContext =createContext(
         removeItemToCart:()=>{}, // para ir quitando items del carrito
         cartCount:0, //para llevar la cuenta de cuantos items hay en el carro /(mas que todo para el icono del shop) 
         clearItemFromCart: () => {},
+        cartTtotal:0,
     }
 )
 
@@ -51,13 +52,24 @@ export const CartDropdownProvider =({children})=>{
     const [isCartOpen,setIsCartOpen]=useState(false);
     const [cartItems,setCartItems]=useState([]);
     const [cartCount,setCartCount]=useState(0);
+    const [cartTotal,setCartTotal]=useState(0)
 
+    // Contador de items en el Carrito
     useEffect(
         ()=>{
-           const newCartCount=cartItems.reduce((accumulator,cartItem)=>{return accumulator+cartItem.quantity},0)
+           const newCartCount=cartItems.reduce((accumulator,cartItem)=>{return accumulator+cartItem.quantity},0)// importante poner
+           // el cero en el reduce, que es el valor inicial
            setCartCount(newCartCount)
         }
     ,[cartItems])//queremos actualizar la cuenta de items cada vez que cambie este estado de cartItems, osea cada que agreguen uno
+
+    // Contador del precio total que sale de la cantidad de items * el precio unitario
+    useEffect(
+        ()=>{
+            const newCartTotal=cartItems.reduce((accumulator,cartItem)=> accumulator+(cartItem.quantity*cartItem.price),0);// importante poner
+            // el cero en el reduce, que es el valor inicial
+            setCartTotal(newCartTotal)
+        },[cartItems]);
 
     const addItemToCart=(productToAdd)=>{
         setCartItems(addCartItem(cartItems,productToAdd))
@@ -71,6 +83,6 @@ export const CartDropdownProvider =({children})=>{
         setCartItems(clearCartItem(cartItems, cartItemToClear));
       };
 
-    const value={isCartOpen,setIsCartOpen,addItemToCart,removeItemToCart,cartItems,cartCount,clearItemFromCart}
+    const value={isCartOpen,setIsCartOpen,addItemToCart,removeItemToCart,cartItems,cartCount,clearItemFromCart,cartTotal}
     return (<CartDropdownContext.Provider value={value} >{children}</CartDropdownContext.Provider>)
 }
