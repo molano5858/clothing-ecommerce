@@ -10,7 +10,8 @@ const App = () => {
     <Routes>
       <Route path='/' element={<Navigation />}> 
         <Route index element={<Home />}/> 
-        <Route path='shop' element={<Shop />}/> 
+        <Route path='shop/*' element={<Shop />}/>
+        {/* 'shop/*' significa que hay rutas anidadas, cuales? nose pero van a venir, asi que igual renderiza <Shop /> */}
         <Route path='auth' element={<Authentication />}/> 
         <Route path='checkout' element={<Checkout />}/> 
       </Route>
